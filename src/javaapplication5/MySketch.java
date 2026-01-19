@@ -38,6 +38,26 @@ public class MySketch extends PApplet {
   private PImage ending2page8;
   private PImage ending2page9;
   private int stage = 0;
+  private int currentStoryPage = 0;
+  private Person[] enemies;
+  private int enemyCount = 0;
+  private int enemiesDefeated = 0;
+  private int maxExtraEnemies = 15; // Max extra enemies that can spawn per level
+  private int spawnTimer = 0; // Enemy spawn timers
+  private int spawnDelay; // Changes per level
+  private String nextSpawnType = "slow"; // Alternates between enemy types
+  private Person[] healthPotions;
+  private Person[] scrolls;
+  private Person goldenCudgel;
+  private int potionCount = 0;
+  private int scrollCount = 0;
+  private int maxPotions = 8;
+  private int maxScrolls = 18;
+  private Wall[] walls;
+  private int wallCount = 0;
+  private int currentLevel = 1;
+  private boolean cudgelPickedUp = false;
+  private boolean allScrollsCollected = false;
   private static final int WORLD_WIDTH = 1200;
   private static final int WORLD_HEIGHT = 1200;
   private static final float PLAYER_SPEED = 5;
