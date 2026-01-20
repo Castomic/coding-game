@@ -37,7 +37,7 @@ public class Person {
         this.hasGoldenCudgel = false;
         this.isAlive = true;
         this.attackCooldown = 0;
-        
+     
         try {
              this.image = app.loadImage(imagePath);
              if (this.image != null) {

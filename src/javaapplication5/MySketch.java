@@ -866,6 +866,7 @@ public class MySketch extends PApplet {
     setupLevel(1);
   }
   
+  @Override
   public void keyPressed() {
     switch (stage) {
         case 0: // Menu
