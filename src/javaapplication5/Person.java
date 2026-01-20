@@ -26,6 +26,7 @@ public class Person {
     private static final int CUDGEL_DAMAGE = 25; // Cudgel damage per hit
     private static final float CUDGEL_RANGE = 60; // Attack range
     
+    // Constructor
     public Person(PApplet p, int x, int y, String imagePath) {
         this.app = p;
         this.x = x;
@@ -49,6 +50,7 @@ public class Person {
         }
     }
     
+    // Overloaded Constructor
     public Person(PApplet p, int x, int y, String imagePath, String type, int health) {
         this.app = p;
         this.x = x;
@@ -73,11 +75,13 @@ public class Person {
         }
     }
     
+    // Constructor
     public void move(int dx, int dy) {
         x += dx;
         y += dy;
     }
     
+    // Overloaded Constructor
     public void move(int dx, int dy, int worldWidth, int worldHeight) {
         x += dx;
         y += dy;
@@ -93,6 +97,7 @@ public class Person {
         if (y > worldHeight - height)
             y = worldHeight - height;
     }
+    
     
     public void draw() {
         if (image != null) {
@@ -142,8 +147,8 @@ public class Person {
     public boolean isCollidingWith(Person other) {
         int centerX = x+(width/2);
         int centerY = y+(height/2);
-        int otherCenterX = other.x+(other.image.pixelWidth/2);
-        int otherCenterY = other.y+(other.image.pixelWidth/2);
+        int otherCenterX = other.x+(other.width/2);
+        int otherCenterY = other.y+(other.width/2);
         float d = PApplet.dist(otherCenterX, otherCenterY, centerX, centerY);
         return d < 32;
     }
@@ -171,7 +176,17 @@ public class Person {
         return d < 16;
     }
     
-    public void takeDamage(String enemyType) {
+    public void takeDamage(int damage) {
+        if (!isAlive) 
+            return;
+        health -= damage;
+        if (health <= 0) {
+            health = 0;
+            isAlive = false;
+        }
+            
+    }
+    public void takeDamageFromEnemy(String enemyType) {
         if (!isAlive || !type.equals("player")) return;
 
         int damage = 0;   
@@ -254,7 +269,94 @@ public class Person {
         app.ellipse(x + width/2, y + height/2, CUDGEL_RANGE * 2, CUDGEL_RANGE * 2);
     }
     
+    public void updateAI(float playerX, float playerY) {
+        if (!isAlive || type.equals("player"))
+            return;
+        
+        switch (type) {
+            case "slow":
+                // Slow demons move directly toward player
+                float dx = playerX - x;
+                float dy = playerY - y;
+                float distance = (float) Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 0) {
+                    dx = (dx / distance) * 1.0f;
+                    dy = (dy / distance) * 1.0f;
+                    x += dx;
+                    y += dy;
+                }
+                break;
+            case "fast":
+                if (x < playerX) {
+                    x += 1.5f;
+                }
+                if (x > playerX) {
+                    x -= 1.5f;
+                }
+                if (y < playerY) {
+                    y += 1.5f;
+                }
+                if (y > playerY)
+                    y -= 1.5f;
+                break;
+            case "ranged":
+                // Ranged demons keep distance
+                float dist = app.dist(x, y, playerX, playerY);
+                if (dist < 100) {
+                    // Move away if too close
+                    if (x < playerX) {
+                        x -= 1.5f;
+                    }
+                    if (x > playerX) {
+                        x += 1.5f;
+                    }
+                    if (y < playerY) {
+                        y -= 1.5f;
+                    }
+                    if (y > playerY)
+                        y += 1.5f;
+                } else if (dist > 200) {
+                    // Move closer if too far
+                    if (x < playerX) {
+                        x += 1.5f;
+                    }
+                    if (x > playerX) {
+                        x -= 1.5f;
+                    }
+                    if (y < playerY) {
+                        y += 1.5f;
+                    }
+                    if (y > playerY)
+                        y -= 1.5f;
+                }
+                break;
+        }
+    }
+    
+    public void update() {
+        if (attackCooldown > 0) {
+            attackCooldown--;
+        }
+    }
     // Getter methods
+    
+    public boolean hasGoldenCudgel() {
+        return hasGoldenCudgel;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+    
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+    
     public int getWeaponDamage() {
         return CUDGEL_DAMAGE;
     }
@@ -275,14 +377,6 @@ public class Person {
         return score;
     }
 
-    public boolean hasGoldenCudgel() {
-        return hasGoldenCudgel;
-    }
-
-    public boolean isAlive() {
-        return isAlive;
-    }
-
     public int getAttackCooldown() {
         return attackCooldown;
     }
@@ -293,6 +387,10 @@ public class Person {
 
     public int getHeight() {
         return height;
+    }
+    
+    public String getType() {
+        return type;
     }
     
     // Setter methods
@@ -310,6 +408,10 @@ public class Person {
 
     public void setAlive(boolean alive) {
         this.isAlive = alive;
+    }
+    
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
     }
 }
 
